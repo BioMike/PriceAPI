@@ -78,7 +78,7 @@ class Bitcoin
 	    $output = curl_exec($ch);
 	    $data = json_decode($output, true);
 	    $volume = $data['result'][0]['Volume'];
-	    $price = round(($data['result'][0]['Bid'] + $data['result'][0]['ask'])/2, 8);
+	    $price = round(($data['result'][0]['Bid'] + $data['result'][0]['Ask'])/2, 8);
 	
 	    $save_data = array("volume" => $volume, "price" => $price);
 	    $output = json_encode($save_data);
