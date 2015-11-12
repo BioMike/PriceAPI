@@ -62,6 +62,20 @@ class Euro
 		{
 		$this->fetch_clevercoin();
 		}
+	    // Check if bl3p data is up to date.
+	    if(file_exists("data/bl3p_eur.dat"))
+		{
+		//check age
+		if(filemtime("data/bl3p_eur.dat") < time() - 600)
+		    {
+		    // File older than 10 minutes.
+		    $this->fetch_bl3p();
+		    }
+		}
+		else
+		{
+		$this->fetch_bl3p();
+		}
 	    }
 	
 	function fetch_btce()
@@ -121,20 +135,39 @@ class Euro
 	    file_put_contents("data/clevercoin_eur.dat", $output, LOCK_EX);
 	    }
 	
+	function fetch_bl3p()
+	    {
+	    // Get data from bl3p and store in data/bl3p_eur.dat
+	    $ch = curl_init();
+	
+	    curl_setopt($ch, CURLOPT_URL, "https://api.bl3p.eu/1/BTCEUR/ticker");
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	    $output = curl_exec($ch);
+	    curl_close($ch);
+	    $data = json_decode($output, true);
+	    $volume = $data['volume']['24h'];
+	    $price = round(($data['ask'] + $data['bid'])/2, 8);
+	
+	    $save_data = array("volume" => $volume, "price" => $price);
+	    $output = json_encode($save_data);
+	
+	    file_put_contents("data/bl3p_eur.dat", $output, LOCK_EX);
+	    }
+	
 	function get_price()
 	    {
 	    // open files and get contents in array
 	    $btc_eur = json_decode(file_get_contents("data/btce_eur.dat"), true);
 	    $kraken_eur = json_decode(file_get_contents("data/kraken_eur.dat"), true);
 	    $clevercoin_eur = json_decode(file_get_contents("data/clevercoin_eur.dat"), true);
+	    $bl3p_eur = json_decode(file_get_contents("data/bl3p_eur.dat"), true);
 	
-	    $trade_totals = $btc_eur["volume"] + $kraken_eur["volume"] + $clevercoin_eur["volume"];
+	    $trade_totals = $btc_eur["volume"] + $kraken_eur["volume"] + $clevercoin_eur["volume"] + $bl3p_eur["volume"];
 	
 	    $price = ($btc_eur["price"]*($btc_eur["volume"]/$trade_totals)) + ($kraken_eur["price"]*($kraken_eur["volume"]/$trade_totals)) +
-	             ($clevercoin_eur["price"]*($clevercoin_eur["volume"]/$trade_totals));
+	             ($clevercoin_eur["price"]*($clevercoin_eur["volume"]/$trade_totals)) + ($bl3p_eur["price"]*($bl3p_eur["volume"]/$trade_totals));
 	    return($price);
 	    }
-	
 	}
 
 ?>
