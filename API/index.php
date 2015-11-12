@@ -15,7 +15,9 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-include("_bitcoin.php");
+// Uncomment the currency that you would like to get the price data from.
+include("_bitcoin_aur.php");
+//include("_bitcoin_nlg.php");
 include("_euro.php");
 include("_usd.php");
 include("_ISK.php");
