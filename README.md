@@ -1,5 +1,5 @@
 # PriceAPI
-An API that gives you the spot price of Auroracoin for Islandic Krona, Bitcoin, Euro and US Dollar.
+An API that gives you the spot price of Auroracoin for Islandic Krona, Bitcoin, Euro and US Dollar; or the spot price of Gulden for Bitcoin, Euro and US Dollar.
 
 See http://ercinee.eu/ for more information.
 
