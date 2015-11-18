@@ -48,20 +48,6 @@ class Bitcoin
 		{
 		$this->fetch_bter();
 		}
-	
-	    if(file_exists("data/cexio.dat"))
-		{
-		//check age
-		if(filemtime("data/cexio.dat") < time() - 600)
-		    {
-		    // File older than 10 minutes.
-		    $this->fetch_cexio();
-		    }
-		}
-		else
-		{
-		$this->fetch_cexio();
-		}
 	    }
 	
 	function fetch_cryptsy()
@@ -104,33 +90,15 @@ class Bitcoin
 	    file_put_contents("data/bter.dat", $output, LOCK_EX);
 	    }
 	
-	function fetch_cexio()
-	    {
-	    // Get data from CEX.io and store in data/cexio.dat
-	    $ch = curl_init();
-	    curl_setopt($ch, CURLOPT_URL, "https://cex.io/api/ticker/AUR/BTC");
-	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	    $output = curl_exec($ch);
-	    $data = json_decode($output, true);
-	    $volume = $data['volume'];
-	    $price = round(($data['ask'] + $data['bid'])/2, 8);
-	
-	    $save_data = array("volume" => $volume, "price" => $price);
-	    $output = json_encode($save_data);
-	
-	    file_put_contents("data/cexio.dat", $output, LOCK_EX);
-	    }
-	
 	function get_price()
 	    {
 	    // open files and get contents in array
 	    $cryptsy = json_decode(file_get_contents("data/cryptsy.dat"), true);
 	    $bter = json_decode(file_get_contents("data/bter.dat"), true);
-	    $cexio = json_decode(file_get_contents("data/cexio.dat"), true);
 	    
-	    $trade_totals = $cryptsy["volume"] + $bter["volume"] + $cexio["volume"];
+	    $trade_totals = $cryptsy["volume"] + $bter["volume"];
 	    
-	    $price = ($cryptsy["price"]*($cryptsy["volume"]/$trade_totals)) + ($bter["price"]*($bter["volume"]/$trade_totals)) + ($cexio["price"]*($cexio["volume"]/$trade_totals));
+	    $price = ($cryptsy["price"]*($cryptsy["volume"]/$trade_totals)) + ($bter["price"]*($bter["volume"]/$trade_totals)));
 	    
 	    return($price);
 	    }
