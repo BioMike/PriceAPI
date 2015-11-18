@@ -98,7 +98,7 @@ class Bitcoin
 	    
 	    $trade_totals = $cryptsy["volume"] + $bter["volume"];
 	    
-	    $price = ($cryptsy["price"]*($cryptsy["volume"]/$trade_totals)) + ($bter["price"]*($bter["volume"]/$trade_totals)));
+	    $price = ($cryptsy["price"]*($cryptsy["volume"]/$trade_totals)) + ($bter["price"]*($bter["volume"]/$trade_totals));
 	    
 	    return($price);
 	    }
