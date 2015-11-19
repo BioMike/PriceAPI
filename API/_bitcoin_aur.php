@@ -49,6 +49,21 @@ class Bitcoin
 		$this->fetch_bter();
 		}
 	    }
+	    if(file_exists("data/cryptopia.dat"))
+		{
+		//check age
+		if(filemtime("data/cryptopia.dat") < time() - 600)
+		    {
+		    // File older than 10 minutes.
+		    $this->fetch_cryptopia();
+		    }
+		}
+		else
+		{
+		$this->fetch_cryptopia();
+		}
+	    }
+	
 	
 	function fetch_cryptsy()
 	    {
@@ -90,15 +105,34 @@ class Bitcoin
 	    file_put_contents("data/bter.dat", $output, LOCK_EX);
 	    }
 	
+	function fetch_cryptopia()
+	    {
+	    // Get data from Bter and store in data/bter.dat
+	    $ch = curl_init();
+	    curl_setopt($ch, CURLOPT_URL, "https://www.cryptopia.co.nz/api/GetMarket/2671");
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	    $output = curl_exec($ch);
+	    $data = json_decode($output, true);
+	    $volume = $data['Volume'];
+	    $price = round(($data['AskPrice'] + $data['BidPrice'])/2, 8);
+	
+	    $save_data = array("volume" => $volume, "price" => $price);
+	    $output = json_encode($save_data);
+	
+	    file_put_contents("data/cryptopia.dat", $output, LOCK_EX);
+	    }
+	
 	function get_price()
 	    {
 	    // open files and get contents in array
 	    $cryptsy = json_decode(file_get_contents("data/cryptsy.dat"), true);
 	    $bter = json_decode(file_get_contents("data/bter.dat"), true);
+	    $cryptopia = json_decode(file_get_contents("data/cryptopia.dat"), true);
 	    
-	    $trade_totals = $cryptsy["volume"] + $bter["volume"];
+	    $trade_totals = $cryptsy["volume"] + $bter["volume"] + $cryptopia["volume"];
 	    
-	    $price = ($cryptsy["price"]*($cryptsy["volume"]/$trade_totals)) + ($bter["price"]*($bter["volume"]/$trade_totals));
+	    $price = ($cryptsy["price"]*($cryptsy["volume"]/$trade_totals)) + ($bter["price"]*($bter["volume"]/$trade_totals)) + 
+	             ($cryptopia["price"]*($cryptopia["volume"]/$trade_totals));
 	    
 	    return($price);
 	    }
