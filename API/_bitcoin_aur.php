@@ -62,6 +62,38 @@ class Bitcoin
 		{
 		$this->fetch_cryptopia();
 		}
+	    if(file_exists("data/bittrex_aur.dat"))
+		{
+		//check age
+		if(filemtime("data/bittrex_au.dat") < time() - 600)
+		    {
+		    // File older than 10 minutes.
+		    $this->fetch_bittrex();
+		    }
+		}
+		else
+		{
+		$this->fetch_bittrex();
+		}
+	    }
+	
+	function fetch_bittrex()
+	    {
+	    // Get data from Bittrex and store in data/bittrex.dat
+	    $ch = curl_init();
+
+	    curl_setopt($ch, CURLOPT_URL, "https://bittrex.com/api/v1.1/public/getmarketsummary?market=BTC-AUR");
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+	    $output = curl_exec($ch);
+	    $data = json_decode($output, true);
+	    curl_close($ch);
+	    $volume = $data['result'][0]['Volume'];
+	    $price = round(($data['result'][0]['Ask'] + $data['result'][0]['Bid'])/2, 8);
+
+	    $save_data = array("volume" => $volume, "price" => $price);
+	    $output = json_encode($save_data);
+	
+	    file_put_contents("data/bittrex_aur.dat", $output, LOCK_EX);
 	    }
 	
 	
@@ -128,11 +160,12 @@ class Bitcoin
 	    $cryptsy = json_decode(file_get_contents("data/cryptsy.dat"), true);
 	    $bter = json_decode(file_get_contents("data/bter.dat"), true);
 	    $cryptopia = json_decode(file_get_contents("data/cryptopia.dat"), true);
+	    $bittrex = json_decode(file_get_contents("data/bittrex_aur.dat"), true);
 	    
-	    $trade_totals = $cryptsy["volume"] + $bter["volume"] + $cryptopia["volume"];
+	    $trade_totals = $cryptsy["volume"] + $bter["volume"] + $cryptopia["volume"] + $bittrex["volume"];
 	    
 	    $price = ($cryptsy["price"]*($cryptsy["volume"]/$trade_totals)) + ($bter["price"]*($bter["volume"]/$trade_totals)) + 
-	             ($cryptopia["price"]*($cryptopia["volume"]/$trade_totals));
+	             ($cryptopia["price"]*($cryptopia["volume"]/$trade_totals)) + ($bittrex["price"]*($bittrex["volume"]/$trade_totals));
 	    
 	    return($price);
 	    }

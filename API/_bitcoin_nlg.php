@@ -21,10 +21,10 @@ class Bitcoin
 	function __construct()
 	    {
 	    // Check if Cryptsy data is up to date.
-	    if(file_exists("data/bittrex.dat"))
+	    if(file_exists("data/bittrex_nlg.dat"))
 		{
 		//check age
-		if(filemtime("data/bittrex.dat") < time() - 600)
+		if(filemtime("data/bittrex_nlg.dat") < time() - 600)
 		    {
 		    // File older than 10 minutes.
 		    $this->fetch_bittrex();
@@ -66,7 +66,7 @@ class Bitcoin
 	    $save_data = array("volume" => $volume, "price" => $price);
 	    $output = json_encode($save_data);
 	
-	    file_put_contents("data/bittrex.dat", $output, LOCK_EX);
+	    file_put_contents("data/bittrex_nlg.dat", $output, LOCK_EX);
 	    }
 	
 	function fetch_bleutrade()
@@ -89,7 +89,7 @@ class Bitcoin
 	function get_price()
 	    {
 	    // open files and get contents in array
-	    $bittrex = json_decode(file_get_contents("data/bittrex.dat"), true);
+	    $bittrex = json_decode(file_get_contents("data/bittrex_nlg.dat"), true);
 	    $bleutrade = json_decode(file_get_contents("data/bleutrade.dat"), true);
 	    
 	    $trade_totals = $bittrex["volume"] + $bleutrade["volume"];
