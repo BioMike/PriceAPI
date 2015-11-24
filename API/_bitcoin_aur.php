@@ -48,7 +48,6 @@ class Bitcoin
 		{
 		$this->fetch_bter();
 		}
-	    }
 	    if(file_exists("data/cryptopia.dat"))
 		{
 		//check age
@@ -65,7 +64,7 @@ class Bitcoin
 	    if(file_exists("data/bittrex_aur.dat"))
 		{
 		//check age
-		if(filemtime("data/bittrex_au.dat") < time() - 600)
+		if(filemtime("data/bittrex_aur.dat") < time() - 600)
 		    {
 		    // File older than 10 minutes.
 		    $this->fetch_bittrex();
@@ -145,8 +144,8 @@ class Bitcoin
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	    $output = curl_exec($ch);
 	    $data = json_decode($output, true);
-	    $volume = $data['Volume'];
-	    $price = round(($data['AskPrice'] + $data['BidPrice'])/2, 8);
+	    $volume = $data['Data']['Volume'];
+	    $price = round(($data['Data']['AskPrice'] + $data['Data']['BidPrice'])/2, 8);
 	
 	    $save_data = array("volume" => $volume, "price" => $price);
 	    $output = json_encode($save_data);
